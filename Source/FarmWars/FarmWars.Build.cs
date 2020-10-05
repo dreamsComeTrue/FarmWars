@@ -8,7 +8,7 @@ public class FarmWars : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Paper2D", "MovieScene", "ActorSequence" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "Paper2D", "MovieScene", "ActorSequence", "UMG" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

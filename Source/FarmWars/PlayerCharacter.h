@@ -19,6 +19,7 @@ protected:
 	void MoveForward(float AxisValue);
 	void MoveRight(float AxisValue);
 	void JumpAction();
+	void InteractAction();
 
 public:
 	virtual void Tick(float DeltaTime) override;
@@ -29,6 +30,9 @@ public:
 	void MoveAnimation(bool shouldPlay);
 
 	virtual void MoveAnimation_Implementation(bool shouldPlay);
+
+	void SetInventoryItem(class AAnimalCharacter* Item);
+	void ClearInventoryItem();
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -45,6 +49,8 @@ private:
 
 	FVector2D CameraInput;
 	FVector2D MovementInput;
+
+	class AAnimalCharacter* InventoryItem;
 
 	bool bMovingForward = false;
 	bool bMovingSideways = false;

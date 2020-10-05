@@ -1,4 +1,5 @@
 #include "PlayerCharacter.h"
+#include "AnimalCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/StaticMeshComponent.h"
@@ -6,11 +7,14 @@
 #include "ActorSequence/Public/ActorSequencePlayer.h"
 #include "ActorSequence/Public/ActorSequenceComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Engine.h"
 
 APlayerCharacter::APlayerCharacter()
 {
 	MovementSpeed = 400.0f;
 	PrimaryActorTick.bCanEverTick = true;
+
+	InventoryItem = nullptr;
 
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 	PlayerCamera->SetupAttachment(RootComponent);
@@ -24,6 +28,7 @@ APlayerCharacter::APlayerCharacter()
 	StaticMeshComponent->SetRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
 	StaticMeshComponent->SetRelativeScale3D(FVector(40.0f, 40.0f, 40.0f));
 	StaticMeshComponent->SetRelativeLocation(FVector(0.0f, 0.0f, -30.0f));
+	StaticMeshComponent->SetGenerateOverlapEvents(false);
 	StaticMeshComponent->SetupAttachment(SceneComponent);
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(9.0f);
@@ -52,6 +57,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	PlayerInputComponent->BindAxis("MoveForward", this, &APlayerCharacter::MoveForward);
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &APlayerCharacter::JumpAction);
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &APlayerCharacter::InteractAction);
 }
 
 void APlayerCharacter::YawCamera(float AxisValue)
@@ -108,6 +114,28 @@ void APlayerCharacter::JumpAction()
 	Jump();
 }
 
+void APlayerCharacter::InteractAction()
+{
+	if (InventoryItem)
+	{
+		GEngine->AddOnScreenDebugMessage((uint64)-1, 2.0f, FColor::Emerald, FString("FULL: ") + 
+			InventoryItem->GetName());
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage((uint64)-1, 2.0f, FColor::Emerald, FString("EMPTY!"));
+	}
+}
+
+void APlayerCharacter::SetInventoryItem(class AAnimalCharacter* Item)
+{
+	InventoryItem = Item;
+}
+
+void APlayerCharacter::ClearInventoryItem()
+{
+	InventoryItem = nullptr;
+}
 
 void APlayerCharacter::MoveAnimation_Implementation(bool shouldPlay)
 {
