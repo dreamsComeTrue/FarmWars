@@ -21,18 +21,27 @@ protected:
 	void JumpAction();
 	void InteractAction();
 
+	void UpdateInventoryItemTransform();
+
 public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UFUNCTION(BlueprintNativeEvent)
-	void MoveAnimation(bool shouldPlay);
+		void MoveAnimation(bool shouldPlay);
 
 	virtual void MoveAnimation_Implementation(bool shouldPlay);
 
-	void SetInventoryItem(class AAnimalCharacter* Item);
-	void ClearInventoryItem();
+	void SetPotentialInventoryItem(class AAnimalCharacter* Item);
+	void ClearPotentialInventoryItem();
+
+	class AAnimalCharacter* GetInventoryItem() { return InventoryItem; }
+
+	UFUNCTION(BlueprintNativeEvent)
+		void InventoryItemChanged(class AAnimalCharacter* InventoryItem);
+
+	virtual void InventoryItemChanged_Implementation(class AAnimalCharacter* InventoryItem);
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -50,8 +59,12 @@ private:
 	FVector2D CameraInput;
 	FVector2D MovementInput;
 
-	class AAnimalCharacter* InventoryItem;
+	class AAnimalCharacter* PotentialInventoryItem;
 
 	bool bMovingForward = false;
 	bool bMovingSideways = false;
+
+public:
+	UPROPERTY(BlueprintReadOnly)
+		class AAnimalCharacter* InventoryItem;
 };

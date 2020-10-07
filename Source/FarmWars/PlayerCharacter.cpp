@@ -15,6 +15,7 @@ APlayerCharacter::APlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	InventoryItem = nullptr;
+	PotentialInventoryItem = nullptr;
 
 	PlayerCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("PlayerCamera"));
 	PlayerCamera->SetupAttachment(RootComponent);
@@ -29,6 +30,7 @@ APlayerCharacter::APlayerCharacter()
 	StaticMeshComponent->SetRelativeScale3D(FVector(40.0f, 40.0f, 40.0f));
 	StaticMeshComponent->SetRelativeLocation(FVector(0.0f, 0.0f, -30.0f));
 	StaticMeshComponent->SetGenerateOverlapEvents(false);
+	StaticMeshComponent->SetReceivesDecals(false);
 	StaticMeshComponent->SetupAttachment(SceneComponent);
 
 	GetCapsuleComponent()->SetCapsuleHalfHeight(9.0f);
@@ -46,6 +48,23 @@ void APlayerCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	MoveAnimation(bMovingForward || bMovingSideways);
+
+	UpdateInventoryItemTransform();
+}
+
+void APlayerCharacter::UpdateInventoryItemTransform()
+{
+	//	Could have been done with Sockets and attachments as well
+	if (InventoryItem)
+	{
+		FVector Location = this->GetActorLocation();
+		Location.Z += 120;
+
+		if (InventoryItem->GetActorLocation() != Location)
+		{
+			InventoryItem->SetActorLocationAndRotation(Location, this->GetControlRotation());
+		}
+	}
 }
 
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -118,25 +137,37 @@ void APlayerCharacter::InteractAction()
 {
 	if (InventoryItem)
 	{
-		GEngine->AddOnScreenDebugMessage((uint64)-1, 2.0f, FColor::Emerald, FString("FULL: ") + 
-			InventoryItem->GetName());
+		AAnimalCharacter* CurrentItem = InventoryItem;
+
+		InventoryItem = nullptr;
+		CurrentItem->Drop(this);
 	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage((uint64)-1, 2.0f, FColor::Emerald, FString("EMPTY!"));
+		if (PotentialInventoryItem != nullptr && PotentialInventoryItem->Grab(this))
+		{
+			InventoryItem = PotentialInventoryItem;
+		}
 	}
+
+	InventoryItemChanged(InventoryItem);
 }
 
-void APlayerCharacter::SetInventoryItem(class AAnimalCharacter* Item)
+void APlayerCharacter::SetPotentialInventoryItem(class AAnimalCharacter* Item)
 {
-	InventoryItem = Item;
+	PotentialInventoryItem = Item;
 }
 
-void APlayerCharacter::ClearInventoryItem()
+void APlayerCharacter::ClearPotentialInventoryItem()
 {
-	InventoryItem = nullptr;
+	PotentialInventoryItem = nullptr;
 }
 
 void APlayerCharacter::MoveAnimation_Implementation(bool shouldPlay)
 {
+}
+
+void APlayerCharacter::InventoryItemChanged_Implementation(class AAnimalCharacter* InventoryItem)
+{
+
 }
