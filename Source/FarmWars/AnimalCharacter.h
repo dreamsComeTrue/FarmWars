@@ -79,7 +79,7 @@ public:
 	UPROPERTY(EditAnywhere)
 		class UWidgetComponent* GrabWidgetComponent;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TArray<class UStaticMesh*> StaticMeshes;
 
 	UPROPERTY(BlueprintReadWrite)

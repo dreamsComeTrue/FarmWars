@@ -19,6 +19,7 @@ AAnimalCharacter::AAnimalCharacter()
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMeshComponent->SetReceivesDecals(false);
+	StaticMeshComponent->SetIsReplicated(true);
 	StaticMeshComponent->SetupAttachment(SceneComponent);
 
 	TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
@@ -40,11 +41,6 @@ AAnimalCharacter::AAnimalCharacter()
 void AAnimalCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (StaticMeshes.Num() != 0)
-	{
-		StaticMeshComponent->SetStaticMesh(StaticMeshes[FMath::FRand() * StaticMeshes.Num()]);
-	}
 }
 
 void AAnimalCharacter::Tick(float DeltaTime)
@@ -66,7 +62,7 @@ void AAnimalCharacter::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 {
 	APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
 
-	if (Player && !Player->GetInventoryItem())
+	if (Player && !Player->GetInventoryItem() && !OwningPlayer)
 	{
 		GrabWidgetComponent->SetVisibility(true);
 		Player->SetPotentialInventoryItem(this);
@@ -78,7 +74,7 @@ void AAnimalCharacter::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AA
 {
 	APlayerCharacter* Player = Cast<APlayerCharacter>(OtherActor);
 
-	if (Player)
+	if (Player && !OwningPlayer)
 	{
 		GrabWidgetComponent->SetVisibility(false);
 		Player->ClearPotentialInventoryItem();
